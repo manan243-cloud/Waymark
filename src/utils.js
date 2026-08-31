@@ -84,26 +84,17 @@ export function goalProgress(goal) {
 }
 
 export function isOverdue(task) {
-  return !!task.due && task.due < todayStr() && task.status !== "done";
+  return !!task.due && task.due < todayStr() && task.status !== "done" && task.status !== "failed";
 }
 
 export function nextStatus(s) {
-  return s === "todo" ? "doing" : s === "doing" ? "done" : "todo";
+  if (s === "todo") return "doing";
+  if (s === "doing") return "done";
+  if (s === "done") return "failed";
+  return "todo";
 }
 
-export function groupTasks(tasks) {
-  const today = todayStr();
-  const in7s = addDaysStr(7);
-  const groups = { Overdue: [], Today: [], "This week": [], Later: [], Done: [] };
-  tasks.forEach((t) => {
-    if (t.status === "done") groups.Done.push(t);
-    else if (t.due && t.due < today) groups.Overdue.push(t);
-    else if (t.due === today) groups.Today.push(t);
-    else if (t.due && t.due <= in7s) groups["This week"].push(t);
-    else groups.Later.push(t);
-  });
-  return groups;
-}
+export const STATUS_LABEL = { todo: "Not started", doing: "In progress", done: "Done", failed: "Failed" };
 
 // A goal "needs attention" if it has overdue steps, or its deadline is close
 // but progress is still low — i.e. it looks like it's being neglected.

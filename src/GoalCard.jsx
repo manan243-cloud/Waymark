@@ -13,7 +13,7 @@ function TaskRow({ task, onCycle, onMenu }) {
       <span
         className="text-sm flex-1"
         style={{
-          color: task.status === "done" ? "#8a8272" : "#26313A",
+          color: task.status === "done" ? "#8a8272" : task.status === "failed" ? "#A2452F" : "#26313A",
           textDecoration: task.status === "done" ? "line-through" : "none",
         }}
       >

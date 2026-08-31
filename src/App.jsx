@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Compass, Menu, RotateCcw, Plus } from "./icons.jsx";
-import { ElevationHero, StatusDonut, Legend } from "./Charts.jsx";
+import { Compass, Menu, RotateCcw } from "./icons.jsx";
+import { StatusDonut, Legend } from "./Charts.jsx";
 import CategoryProgress from "./CategoryProgress.jsx";
 import GoalSection from "./GoalSection.jsx";
 import NavTabs from "./NavTabs.jsx";
-import LifeLog from "./LifeLog.jsx";
+import TaskListSheet from "./TaskListSheet.jsx";
 import ActionSheet from "./ActionSheet.jsx";
 import FormSheet from "./FormSheet.jsx";
 import { useLongPress } from "./hooks.js";
-import { uid, sampleStore, goalProgress, isOverdue, nextStatus } from "./utils.js";
+import { uid, sampleStore, isOverdue, nextStatus } from "./utils.js";
 
 const STORAGE_KEY = "waymark-data-v2";
 const CATEGORY_PALETTE = ["#4B8B8C", "#5B7A99", "#8A6D3B", "#C08585", "#5B5EA6", "#7C7C4A", "#C4735B", "#8B6F9E"];
@@ -44,6 +44,8 @@ export default function App() {
   const [menu, setMenu] = useState(null);
   // form = { kind, id, goalId?, initial }
   const [form, setForm] = useState(null);
+  // which stat card's list is open: 'total'|'done'|'doing'|'todo'|'overdue'|'failed'
+  const [taskListKey, setTaskListKey] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -291,6 +293,7 @@ export default function App() {
           { label: "Mark not started", disabled: task.status === "todo", onClick: () => setTaskStatus(goal.id, task.id, "todo") },
           { label: "Mark in progress", disabled: task.status === "doing", onClick: () => setTaskStatus(goal.id, task.id, "doing") },
           { label: "Mark done", disabled: task.status === "done", onClick: () => setTaskStatus(goal.id, task.id, "done") },
+          { label: "Mark failed", disabled: task.status === "failed", danger: task.status !== "failed", onClick: () => setTaskStatus(goal.id, task.id, "failed") },
           { divider: true },
           { label: "Edit", onClick: () => setForm({ kind: "edit-task", goalId: goal.id, id: task.id, initial: { title: task.title, due: task.due || "" } }) },
           {
@@ -453,16 +456,6 @@ export default function App() {
             onCategoryMenu={(id) => setMenu({ kind: "category", id })}
           />
 
-          <section className="wm-card rounded-sm p-4 md:p-6 mb-8 overflow-x-auto">
-            {visibleGoals.length > 0 ? (
-              <ElevationHero goals={visibleGoals} />
-            ) : (
-              <p className="text-sm italic py-10 text-center" style={{ color: "#8a8272" }}>
-                No goals here yet — add an expedition or waypoint below.
-              </p>
-            )}
-          </section>
-
           {activeView === "overview" && (
             <CategoryProgress categories={categories} goals={goals} onSelect={setActiveView} />
           )}
@@ -473,74 +466,111 @@ export default function App() {
               done: allTasks.filter((t) => t.status === "done").length,
               doing: allTasks.filter((t) => t.status === "doing").length,
               todo: allTasks.filter((t) => t.status === "todo").length,
+              failed: allTasks.filter((t) => t.status === "failed").length,
             };
-            const overdueCount = allTasks.filter(isOverdue).length;
             const total = allTasks.length;
             const showTag = activeView === "overview";
 
+            const STAT_DEFS = [
+              { key: "total", label: "Total tasks", match: () => true },
+              { key: "done", label: "Done", match: (t) => t.status === "done" },
+              { key: "doing", label: "In progress", match: (t) => t.status === "doing" },
+              { key: "todo", label: "Not started", match: (t) => t.status === "todo" },
+              { key: "overdue", label: "Overdue", match: (t) => isOverdue(t) },
+              { key: "failed", label: "Task failed", match: (t) => t.status === "failed" },
+            ];
+            const activeStat = STAT_DEFS.find((s) => s.key === taskListKey);
+
+            const expeditions = (
+              <GoalSection
+                key="expeditions"
+                label="Expeditions" sub="Long-term goals" timeframe="long"
+                visibleGoals={visibleGoals} categories={categories} activeView={activeView}
+                expanded={expanded} setExpanded={setExpanded} taskDraft={taskDraft} setTaskDraft={setTaskDraft}
+                addingGoalFor={addingGoalFor} setAddingGoalFor={setAddingGoalFor}
+                newGoalTitle={newGoalTitle} setNewGoalTitle={setNewGoalTitle}
+                newGoalDeadline={newGoalDeadline} setNewGoalDeadline={setNewGoalDeadline}
+                newGoalCategory={newGoalCategory} setNewGoalCategory={setNewGoalCategory}
+                addGoal={addGoal} addTask={addTask} cycleStatus={cycleStatus}
+                onGoalMenu={(id) => setMenu({ kind: "goal", id })}
+                onTaskMenu={(goalId, id) => setMenu({ kind: "task", goalId, id })}
+              />
+            );
+            const waypoints = (
+              <GoalSection
+                key="waypoints"
+                label="Waypoints" sub="Short-term goals" timeframe="short"
+                visibleGoals={visibleGoals} categories={categories} activeView={activeView}
+                expanded={expanded} setExpanded={setExpanded} taskDraft={taskDraft} setTaskDraft={setTaskDraft}
+                addingGoalFor={addingGoalFor} setAddingGoalFor={setAddingGoalFor}
+                newGoalTitle={newGoalTitle} setNewGoalTitle={setNewGoalTitle}
+                newGoalDeadline={newGoalDeadline} setNewGoalDeadline={setNewGoalDeadline}
+                newGoalCategory={newGoalCategory} setNewGoalCategory={setNewGoalCategory}
+                addGoal={addGoal} addTask={addTask} cycleStatus={cycleStatus}
+                onGoalMenu={(id) => setMenu({ kind: "goal", id })}
+                onTaskMenu={(goalId, id) => setMenu({ kind: "task", goalId, id })}
+              />
+            );
+
             return (
               <>
-                <section className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-                  {[
-                    { label: "Total tasks", value: total },
-                    { label: "Done", value: counts.done },
-                    { label: "In progress", value: counts.doing },
-                    { label: "Overdue", value: overdueCount, alert: overdueCount > 0 },
-                  ].map((s, i) => (
-                    <div key={i} className="wm-card rounded-sm p-4">
-                      <div className="wm-mono text-2xl" style={{ color: s.alert ? "#A2452F" : "#26313A" }}>{s.value}</div>
-                      <div className="text-xs mt-1" style={{ color: "#6b6355" }}>{s.label}</div>
-                    </div>
-                  ))}
+                <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+                  {STAT_DEFS.map((s) => {
+                    const count = allTasks.filter(s.match).length;
+                    const alert = (s.key === "overdue" || s.key === "failed") && count > 0;
+                    return (
+                      <button
+                        key={s.key}
+                        onClick={() => setTaskListKey(s.key)}
+                        className="wm-card rounded-sm p-4 text-left"
+                      >
+                        <div className="wm-mono text-2xl" style={{ color: alert ? "#A2452F" : "#26313A" }}>{count}</div>
+                        <div className="text-xs mt-1" style={{ color: "#6b6355" }}>{s.label}</div>
+                      </button>
+                    );
+                  })}
                 </section>
 
                 <div className="grid md:grid-cols-5 gap-6">
                   <div className="md:col-span-3 space-y-8">
-                    <GoalSection
-                      label="Expeditions" sub="Long-term goals" timeframe="long"
-                      visibleGoals={visibleGoals} categories={categories} activeView={activeView}
-                      expanded={expanded} setExpanded={setExpanded} taskDraft={taskDraft} setTaskDraft={setTaskDraft}
-                      addingGoalFor={addingGoalFor} setAddingGoalFor={setAddingGoalFor}
-                      newGoalTitle={newGoalTitle} setNewGoalTitle={setNewGoalTitle}
-                      newGoalDeadline={newGoalDeadline} setNewGoalDeadline={setNewGoalDeadline}
-                      newGoalCategory={newGoalCategory} setNewGoalCategory={setNewGoalCategory}
-                      addGoal={addGoal} addTask={addTask} cycleStatus={cycleStatus}
-                      onGoalMenu={(id) => setMenu({ kind: "goal", id })}
-                      onTaskMenu={(goalId, id) => setMenu({ kind: "task", goalId, id })}
-                    />
-                    <GoalSection
-                      label="Waypoints" sub="Short-term goals" timeframe="short"
-                      visibleGoals={visibleGoals} categories={categories} activeView={activeView}
-                      expanded={expanded} setExpanded={setExpanded} taskDraft={taskDraft} setTaskDraft={setTaskDraft}
-                      addingGoalFor={addingGoalFor} setAddingGoalFor={setAddingGoalFor}
-                      newGoalTitle={newGoalTitle} setNewGoalTitle={setNewGoalTitle}
-                      newGoalDeadline={newGoalDeadline} setNewGoalDeadline={setNewGoalDeadline}
-                      newGoalCategory={newGoalCategory} setNewGoalCategory={setNewGoalCategory}
-                      addGoal={addGoal} addTask={addTask} cycleStatus={cycleStatus}
-                      onGoalMenu={(id) => setMenu({ kind: "goal", id })}
-                      onTaskMenu={(goalId, id) => setMenu({ kind: "task", goalId, id })}
-                    />
+                    {activeView === "overview" ? (
+                      <>
+                        {waypoints}
+                        {expeditions}
+                      </>
+                    ) : (
+                      <>
+                        {expeditions}
+                        {waypoints}
+                      </>
+                    )}
                   </div>
 
                   <div className="md:col-span-2">
                     <div className="wm-card rounded-sm p-5">
-                      <div className="flex items-center gap-4 mb-5">
+                      <div className="flex items-center gap-4">
                         <StatusDonut counts={counts} total={total} />
                         <div className="text-xs space-y-1.5">
                           <Legend color="#4F6B52" label={`Done · ${counts.done}`} />
                           <Legend color="#B8843C" label={`In progress · ${counts.doing}`} />
                           <Legend color="#C9C2AF" label={`Not started · ${counts.todo}`} />
+                          <Legend color="#A2452F" label={`Failed · ${counts.failed}`} />
                         </div>
                       </div>
-                      <h2 className="wm-display text-lg mb-3">Life log</h2>
-                      <LifeLog
-                        tasks={allTasks} categories={categories} showTag={showTag}
-                        onCycle={cycleStatus}
-                        onMenu={(goalId, id) => setMenu({ kind: "task", goalId, id })}
-                      />
                     </div>
                   </div>
                 </div>
+
+                <TaskListSheet
+                  open={!!activeStat}
+                  title={activeStat ? activeStat.label : ""}
+                  tasks={activeStat ? allTasks.filter(activeStat.match) : []}
+                  categories={categories}
+                  showTag={showTag}
+                  onCycle={cycleStatus}
+                  onMenu={(goalId, id) => { setTaskListKey(null); setMenu({ kind: "task", goalId, id }); }}
+                  onClose={() => setTaskListKey(null)}
+                />
               </>
             );
           })()}

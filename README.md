@@ -4,6 +4,28 @@ This is your Waymark goal tracker, converted into a standalone Progressive
 Web App (PWA) so it can be installed on your phone's home screen and used
 offline. No build tools or servers needed to run it — it's plain HTML/CSS/JS.
 
+## Latest update
+
+- **Fourth step status: Failed.** Steps now cycle Not started → In progress
+  → Done → Failed (tap the checkbox, or pick it explicitly from a step's
+  menu). Failed steps show a red ✕.
+- **Fixed the top-right menu (☰)** not opening on real phones — it was a
+  genuine bug: a slight finger movement during a tap was cancelling the tap
+  before it registered. Tap detection now uses the browser's native click
+  event, which is far more forgiving of normal touchscreen jitter. This fix
+  applies to every hold-menu in the app, not just the top menu.
+  - **Removed the elevation graph** (the peaks-and-valleys chart) — agreed,
+  it got cluttered. "Where your attention is going" stays.
+- **Removed the Life log** entirely, on the home screen and inside each
+  category.
+- **Waypoints now come first on the Overview screen**, Expeditions second.
+  Inside a single category, the order is unchanged: Expeditions first,
+  Waypoints second.
+- **The 6 stat cards are now buttons.** Tap Total tasks / Done / In progress
+  / Not started / Overdue / Task failed to see exactly which steps make up
+  that number, with the same checkbox and menu you'd get anywhere else in
+  the app.
+
 ## What changed from the original
 
 - **Storage**: swapped Claude's `window.storage` for the browser's built-in
