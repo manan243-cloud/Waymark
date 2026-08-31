@@ -14,9 +14,25 @@ offline. No build tools or servers needed to run it — it's plain HTML/CSS/JS.
 - **Added**: `manifest.json` (app name + icon + "open full-screen" config),
   a `service-worker.js` (caches the app so it still opens with no signal),
   and app icons in `icons/`.
-- Everything else — the UI, the logic, the styling — is the app you already
-  had. `src/App.jsx` is the original component, lightly edited; the built
-  `app.bundle.js` is what the browser actually runs.
+- **Status checkbox**: each step now has a proper checkbox-style control.
+  Tap it to cycle not-started → in progress → done.
+- **Hold menus**: long-press (or right-click on desktop) any category tab,
+  goal, or step — or tap the small ⋮ — for rename / edit / reassign /
+  delete / reorder. The little delete crosses are gone.
+- **Reorder categories**: from a category's menu, "Move earlier" / "Move
+  later".
+- **Reassign anything**: move a goal to a different category, or a step to
+  a different goal, from its menu.
+- **"Restore sample data"** now lives behind the app menu (☰, top right)
+  and always asks for confirmation first, so it can't be tapped by accident.
+- **Attention dashboard**: a new "Where your attention is going" panel on
+  the Overview screen shows progress per category and flags ones that look
+  neglected (overdue steps, or a close deadline with little progress).
+  Individual goals get the same "Needs attention" flag on their card.
+- **Trail log → Life log**: same panel, renamed.
+- Everything else — the core UI, layout, and styling — is the app you
+  already had, split into a few more files under `src/` for easier future
+  edits. The built `app.bundle.js` is what the browser actually runs.
 
 ## Publish it for free with GitHub Pages
 
