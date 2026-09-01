@@ -4,6 +4,17 @@ This is your Waymark goal tracker, converted into a standalone Progressive
 Web App (PWA) so it can be installed on your phone's home screen and used
 offline. No build tools or servers needed to run it — it's plain HTML/CSS/JS.
 
+## Latest fix
+
+- **"Due this week" (and Overdue, and streaks) could be wrong depending on
+  your timezone and time of day.** The bug: "today" was being computed
+  from UTC time, while the date you pick in a due-date field is your
+  local calendar date — in some timezones and at some hours those two
+  disagree by a day, which could make a task due this week not show up,
+  or an on-time task look overdue. Fixed by computing "today" from your
+  device's local date throughout, so it now matches what you actually
+  picked.
+
 ## Latest update
 
 This was a big one — most of the "cool stuff" wishlist in one go:

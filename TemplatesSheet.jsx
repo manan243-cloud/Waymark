@@ -1,0 +1,48 @@
+import React from "react";
+import { Trash2 } from "./icons.jsx";
+
+export default function TemplatesSheet({ open, templates, onDelete, onClose }) {
+  if (!open) return null;
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center"
+      style={{ background: "rgba(38,49,58,0.4)" }}
+      onClick={onClose}
+    >
+      <div
+        className="wm-card w-full sm:w-[28rem] sm:rounded-sm rounded-t-2xl p-4 flex flex-col"
+        style={{ maxHeight: "80vh", paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="text-sm font-medium mb-1">Your templates</div>
+        <p className="text-xs mb-2" style={{ color: "#6b6355" }}>
+          Save a goal's steps as a template from its menu, then start new goals from it.
+        </p>
+        <div className="overflow-y-auto flex-1 divide-y wm-hairline">
+          {templates.length === 0 ? (
+            <p className="text-sm italic py-6 text-center" style={{ color: "#8a8272" }}>
+              No templates saved yet.
+            </p>
+          ) : (
+            templates.map((t) => (
+              <div key={t.id} className="flex items-center gap-2 py-2.5">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm truncate">{t.name}</div>
+                  <div className="text-xs" style={{ color: "#6b6355" }}>
+                    {t.steps.length} step{t.steps.length === 1 ? "" : "s"} · {t.timeframe === "long" ? "Expedition" : "Waypoint"}
+                  </div>
+                </div>
+                <button onClick={() => onDelete(t.id)} className="p-1.5 shrink-0" style={{ color: "#A2452F" }} title="Delete template">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+        <button onClick={onClose} className="w-full text-center px-3 py-2.5 mt-3 border-t wm-hairline text-sm shrink-0" style={{ color: "#6b6355" }}>
+          Close
+        </button>
+      </div>
+    </div>
+  );
+}
