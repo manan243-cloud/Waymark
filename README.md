@@ -6,6 +6,49 @@ offline. No build tools or servers needed to run it — it's plain HTML/CSS/JS.
 
 ## Latest update
 
+This was a big one — most of the "cool stuff" wishlist in one go:
+
+- **Search** — a bar under the header (or press `/`) filters goals and
+  steps by title as you type.
+- **Swipe gestures** — on any step, swipe right to mark it done, swipe
+  left to open its menu.
+- **Undo** — deleting a step, goal, or category shows a 5-second "Undo"
+  toast that puts it right back.
+- **Bulk actions** — open any stat-card list (Overdue, Done, etc.), tap
+  "Select", and mark several steps done/failed or delete them together.
+- **Keyboard shortcuts** (desktop/external keyboard) — `n` starts a new
+  goal, `/` focuses search, `Escape` backs out of whatever's open.
+- **Recurring steps** — set a step to repeat daily/weekly/monthly; marking
+  it done automatically creates the next occurrence.
+- **Notes** — goals and steps can each hold a free-text note, edited from
+  their menu.
+- **Archive** — archive a goal instead of deleting it; find it again from
+  the app menu → "Archived goals" to restore or delete for good.
+- **Templates** — save any goal's steps as a template from its menu, then
+  start new goals from that template (via the small stacked-layers button
+  next to "+ Add").
+- **Streaks** — the attention panel shows a flame + day count next to any
+  category you've touched several days running.
+- **Weekly review** — once every 7 days, a small banner on Overview sums
+  up what got done since last time.
+- UI polish: the header and search/category tabs now stay pinned while
+  you scroll; the stat cards scroll horizontally as a single row on
+  narrow phones instead of wrapping into a grid; finished steps fade
+  instead of staying full-strength.
+
+Not included: push notifications and multi-device sync — both need a
+backend, which felt like a bigger step than the rest of this batch.
+Also skipped: illustrated empty-states (needs real artwork, not just code).
+
+## Previous update
+
+- **"Not started" stat card is now "Due this week"** — shows steps due
+  within the next 7 days (that aren't already done or failed). Tap it to
+  see the list, same as any other stat card.
+- **Urgent-deadline flag**: any step due within the next 48 hours gets a
+  small amber flag icon and bold date, wherever it appears (inside a goal,
+  or in any of the stat-card lists) — so it stands out before it tips over
+  into "Overdue".
 - **Fourth step status: Failed.** Steps now cycle Not started → In progress
   → Done → Failed (tap the checkbox, or pick it explicitly from a step's
   menu). Failed steps show a red ✕.
@@ -14,15 +57,15 @@ offline. No build tools or servers needed to run it — it's plain HTML/CSS/JS.
   before it registered. Tap detection now uses the browser's native click
   event, which is far more forgiving of normal touchscreen jitter. This fix
   applies to every hold-menu in the app, not just the top menu.
-  - **Removed the elevation graph** (the peaks-and-valleys chart) — agreed,
+- **Removed the elevation graph** (the peaks-and-valleys chart) — agreed,
   it got cluttered. "Where your attention is going" stays.
 - **Removed the Life log** entirely, on the home screen and inside each
   category.
 - **Waypoints now come first on the Overview screen**, Expeditions second.
   Inside a single category, the order is unchanged: Expeditions first,
   Waypoints second.
-- **The 6 stat cards are now buttons.** Tap Total tasks / Done / In progress
-  / Not started / Overdue / Task failed to see exactly which steps make up
+- **The stat cards are now buttons.** Tap Total tasks / Done / In progress /
+  Due this week / Overdue / Task failed to see exactly which steps make up
   that number, with the same checkbox and menu you'd get anywhere else in
   the app.
 
