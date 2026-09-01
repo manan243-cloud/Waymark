@@ -4,9 +4,20 @@ This is your Waymark goal tracker, converted into a standalone Progressive
 Web App (PWA) so it can be installed on your phone's home screen and used
 offline. No build tools or servers needed to run it — it's plain HTML/CSS/JS.
 
-## Latest fix
+## Latest fix (v7)
 
-- **"Due this week" (and Overdue, and streaks) could be wrong depending on
+- **Hardened the edit form** (used for editing a step, goal, category
+  rename, reassigning, etc.). It now gets a fresh, isolated set of form
+  state every time you open it for a specific item, instead of syncing
+  from a shared value that could theoretically get reset mid-edit. This
+  shouldn't have been visibly breaking anything, but it was fragile and
+  worth closing off.
+- Reminder: **"Due this week" (and every stat card) is scoped to whatever
+  view you're currently on** — Overview shows everything, but a category
+  tab (like "Health") only counts steps in that category. If a step isn't
+  showing up, check you're looking at Overview or the right category tab.
+
+## Previous fix (timezone)
   your timezone and time of day.** The bug: "today" was being computed
   from UTC time, while the date you pick in a due-date field is your
   local calendar date — in some timezones and at some hours those two

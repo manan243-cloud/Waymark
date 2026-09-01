@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 // A small bottom-sheet form used for editing/renaming/reassigning things.
 // `fields`: [{ key, label, type: 'text'|'date'|'select', options?, placeholder? }]
+//
+// Note: the parent should mount this with a `key` that changes whenever the
+// target changes (e.g. `${form.kind}-${form.id}`). That way React remounts
+// fresh state from `initial` exactly once per target, instead of an effect
+// re-syncing from a new `initial` object reference on every unrelated parent
+// re-render — which was silently discarding in-progress edits.
 export default function FormSheet({ open, title, fields, initial, submitLabel = "Save", onSubmit, onClose }) {
   const [values, setValues] = useState(initial || {});
-
-  useEffect(() => {
-    if (open) setValues(initial || {});
-  }, [open, initial]);
 
   if (!open) return null;
 

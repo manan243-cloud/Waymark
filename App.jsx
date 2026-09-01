@@ -930,7 +930,7 @@ export default function App() {
       )}
 
       <ActionSheet {...getMenuProps()} onClose={closeMenu} />
-      <FormSheet {...getFormProps()} onClose={closeForm} />
+      <FormSheet key={form ? `${form.kind}-${form.id || ""}-${form.goalId || ""}` : "none"} {...getFormProps()} onClose={closeForm} />
       <ArchiveSheet
         open={archiveOpen}
         goals={goals ? goals.filter((g) => g.archived) : []}
